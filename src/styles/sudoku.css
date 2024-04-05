@@ -1,0 +1,21 @@
+.sudokutile {
+    width: 30px;
+    height: 30px;
+    font-size: 2em;
+    appearance: none;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.sudokutile::-webkit-outer-spin-button,
+.sudokutile::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.board {
+    justify-content: center;
+    display: grid;
+    grid-template-rows: 35px 35px 40px 35px 35px 40px 35px 35px 40px;
+    grid-template-columns:  35px 35px 40px 35px 35px 40px 35px 35px 40px;
+}
