@@ -1,10 +1,10 @@
 import '../styles/sudoku.css'
 import {useState} from 'react';
 
-function SudokuTile(tileId, value){
+function SudokuTile(tileId, value, row, col){
     return ( value == null ?
     
-        <input type='number' id={tileId} className="sudokutile" maxLength={1}>
+        <input type='number' id={tileId} onChange={() => inputHandler(tileId, row, col)} className="sudokutile" maxLength={1}>
     </input>
     :
         <input type='number' id={tileId} readOnly={true} value={value} className="sudokutile" maxLength={1} style={{backgroundColor: '#D3D3D3'}}>
@@ -17,7 +17,9 @@ function SudokuTile(tileId, value){
  */
 const counter = 0;
 let gameBoard= [...Array(9)].map(e => Array(9))
-var setupBoard= [...Array(9)].map(e => Array(9).fill(0))
+let setupBoard= [...Array(9)].map(e => Array(9).fill(0))
+let solutionBoard = Array()
+let answerBoard = Array()
 
 
 // throws undefined error for some reason????
@@ -63,8 +65,10 @@ function GenerateBoard(){
     }
 
     SolveSudoku()
+    answerBoard = JSON.parse(JSON.stringify(setupBoard))
 
     removeValues(60)
+    solutionBoard = JSON.parse(JSON.stringify(setupBoard))
 }
 
 function removeValues(dif){
@@ -73,7 +77,7 @@ function removeValues(dif){
         tiles.push(i)
         
     }
-    console.log(tiles)
+    //console.log(tiles)
 
 /**
  * select random index of tiles
@@ -88,7 +92,7 @@ function removeValues(dif){
 
         let row = Math.floor(tiles[indexToRemove] / 9)
         let col = tiles[indexToRemove] % 9
-        console.log(`row: ${row}, col ${col}`)
+        //console.log(`row: ${row}, col ${col}`)
         setupBoard[row][col] = 0
         tiles.splice(indexToRemove, 1)
         
@@ -130,49 +134,83 @@ function shuffleArray(array) {
     }
 }
 
-function CheckBoard() {
-    for (let x = 0; x < 9; x++) {
+function inputHandler(id, row, col){
+    let tile = document.getElementById(id)
+    if (parseInt(tile.value) > 9) {
+        tile.value = 9
+    }
+    else if (parseInt(tile.value) < 1) {
+        tile.value = 1
+    }
+    console.log(`val: ${tile.value} ${row}, ${col}`)
+    solutionBoard[row][col] = parseInt(tile.value);
+}
+
+
+
+function DisplaySudoku(){
+    gameBoard= [...Array(9)].map(e => Array(9))
+    for (let i = 0; i < 9; i++) {
         for (let y = 0; y < 9; y++) {
-            if (setupBoard[x][y] === 0) {
-                return false
+            if (setupBoard[i][y] === 0) {
+                gameBoard[i][y] = SudokuTile(9*i + y, null, i, y)
+                let tile = document.getElementById(9*i + y)
+                if (tile !== null) {
+                    console.log(tile.value)
+                    tile.value = null
+                }
+                    
+            }else {
+                gameBoard[i][y] = SudokuTile(9*i + y, setupBoard[i][y])
+            }
+            
+        }
+    }
+}
+
+function CheckBoard() {
+    var numBlank = 0
+    var numIncorrect = 0
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            if (isNaN(solutionBoard[i][j]) || solutionBoard[i][j] === 0) {
+                numBlank++
+            }
+            else if (!isNaN(solutionBoard[i][j]) && solutionBoard[i][j] !== answerBoard[i][j]){
+                numIncorrect++
             }
         }
-        
     }
-    return true
+
+    console.log(`there are ${numBlank} spaces left and ${numIncorrect} incorrect spaces`)
+
+    if(numBlank === 0){
+        if (numIncorrect === 0) {
+            console.log("win")
+        }
+        else {
+            console.log(`there are ${numIncorrect} incorrect numbers`)
+        }
+    }
 }
-export function SudokuBoard(){
-    const [ name, setName ] = useState(null)
-    //PopulateBoard()
+export function SudokuBoard( val){    
     GenerateBoard()
     console.log(setupBoard)
 
-    function DisplaySudoku(){
-        gameBoard= [...Array(9)].map(e => Array(9))
-        for (let i = 0; i < 9; i++) {
-            for (let y = 0; y < 9; y++) {
-                if (setupBoard[i][y] === 0) {
-                    gameBoard[i][y] = SudokuTile(9*i + y)
-                }else {
-                    gameBoard[i][y] = SudokuTile(9*i + y, setupBoard[i][y])
-                }
-                
-            }
-        }
-    }
-
     DisplaySudoku()
-    function test(){
-        GenerateBoard()
-        console.log(setupBoard)
-        DisplaySudoku()
-    }
 
+    
+    // function test(){
+    //     GenerateBoard()
+    //     console.log(setupBoard)
+    //     DisplaySudoku()
+    // }
     return (<div>
-        hello {name}
+        s u d o k u
         <div className='board'>
             {gameBoard}
         </div>
-        <button onClick={()=>test()}>boop</button>
+        {/* <button onClick={()=>test()}>New Game</button> */}
+        <button onClick={() => CheckBoard()}>Submit</button>
     </div>)
 }

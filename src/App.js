@@ -1,8 +1,13 @@
 import logo from './logo.svg';
 import './App.css';
 import { SudokuBoard } from'./components/sudoku';
+import { useState } from 'react';
 
 function App() {
+  const [seed, setSeed] = useState(null) 
+  function reset(){
+    setSeed(Math.random())
+  }
   return (
     <div className="App">
       {/* <header className="App-header">
@@ -21,7 +26,9 @@ function App() {
       </header> */}
       <h3>Minigames!!!</h3>
       <div>
-        <SudokuBoard />
+
+        <SudokuBoard val={seed}/>
+        <button onClick={() => reset()}>New Game</button>
       </div>
     </div>
   );
